@@ -54,7 +54,6 @@ func Start() {
 	wg.Add(3)
 	//Dummy event producer for testing purpose
 	go kf.DevMessageProducer(context.Background())
-	//todo listen to stop channel in read events
 	go el.ReadEvents()
 	go el.PersistQuery()
 	err = router.Run(":" + processorConfig.Port)

@@ -92,10 +92,6 @@ func (m *MockRepo) InsertQueryEvent(data model.QueryEvent) error {
 	return args.Error(0)
 }
 
-func (m *MockRepo) BulkInsertEvent(dataList []*model.QueryEvent) error {
-	return nil
-}
-
 func (m *MockRepo) GetQueryEventCount(paths []string) (map[string]interface{}, error) {
 	args := m.Called(paths)
 	return args.Get(0).(map[string]interface{}), args.Error(1)

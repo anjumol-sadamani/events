@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"eventprocessor/event_processor"
 	"eventprocessor/model"
 	"net/http"
 	"testing"
@@ -15,10 +14,9 @@ func Test_CountEvents(t *testing.T) {
 	type testData struct {
 		name        string
 		result      interface{}
-		mockClosure func(mock *event_processor.MockRepo)
+		mockClosure func(mock *MockEventRepo)
 		statusCode  int
 	}
-
 	events := getSampleEvent()
 
 	deal := make(map[string]interface{}, 0)
@@ -35,7 +33,7 @@ func Test_CountEvents(t *testing.T) {
 	tests := []testData{
 		{
 			name: "Success",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCount", mock.Anything).Return(events, nil).Once()
 			},
 			result:     model.SuccessResponse(exp),
@@ -43,7 +41,7 @@ func Test_CountEvents(t *testing.T) {
 		},
 		{
 			name: "DB Error",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCount", mock.Anything).Return((map[string]interface{})(nil), errors.New("DB connection error")).Once()
 			},
 			result:     model.FailureResponse("Failed to get count", http.StatusInternalServerError),
@@ -52,7 +50,7 @@ func Test_CountEvents(t *testing.T) {
 
 		{
 			name: "No events",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCount", mock.Anything).Return((map[string]interface{})(nil), nil).Once()
 			},
 			result:     model.FailureResponse("Query not available", http.StatusNotFound),
@@ -63,7 +61,7 @@ func Test_CountEvents(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			mockRepo := &event_processor.MockRepo{}
+			mockRepo := &MockEventRepo{}
 			test.mockClosure(mockRepo)
 			defer mockRepo.AssertExpectations(t)
 
@@ -84,7 +82,7 @@ func Test_CountEventsByDay(t *testing.T) {
 	type testData struct {
 		name        string
 		result      interface{}
-		mockClosure func(mock *event_processor.MockRepo)
+		mockClosure func(mock *MockEventRepo)
 		statusCode  int
 	}
 
@@ -108,7 +106,7 @@ func Test_CountEventsByDay(t *testing.T) {
 	tests := []testData{
 		{
 			name: "Success",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCountByDay", mock.Anything).Return(list, nil).Once()
 			},
 			result:     model.SuccessResponse(expList),
@@ -116,7 +114,7 @@ func Test_CountEventsByDay(t *testing.T) {
 		},
 		{
 			name: "DB Error",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCountByDay", mock.Anything).Return(([]map[string]interface{})(nil), errors.New("DB connection error")).Once()
 			},
 			result:     model.FailureResponse("Failed to get count", http.StatusInternalServerError),
@@ -125,7 +123,7 @@ func Test_CountEventsByDay(t *testing.T) {
 
 		{
 			name: "No events",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("GetQueryEventCountByDay", mock.Anything).Return(([]map[string]interface{})(nil), nil).Once()
 			},
 			result:     model.FailureResponse("Query not available", http.StatusNotFound),
@@ -136,7 +134,7 @@ func Test_CountEventsByDay(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			mockRepo := &event_processor.MockRepo{}
+			mockRepo := &MockEventRepo{}
 			test.mockClosure(mockRepo)
 			defer mockRepo.AssertExpectations(t)
 
@@ -156,7 +154,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 	type testData struct {
 		name        string
 		result      interface{}
-		mockClosure func(mock *event_processor.MockRepo)
+		mockClosure func(mock *MockEventRepo)
 		statusCode  int
 	}
 	list := getSampleEventByMetadata()
@@ -178,7 +176,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 	tests := []testData{
 		{
 			name: "Success",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("CountQueryEventsByMetadata", mock.Anything, mock.Anything).Return(list, nil).Once()
 			},
 			result:     model.SuccessResponse(expList),
@@ -186,7 +184,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 		},
 		{
 			name: "DB Error",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("CountQueryEventsByMetadata", mock.Anything, mock.Anything).Return(([]map[string]interface{})(nil), errors.New("DB connection error")).Once()
 			},
 			result:     model.FailureResponse("Failed to get count", http.StatusInternalServerError),
@@ -195,7 +193,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 
 		{
 			name: "No events",
-			mockClosure: func(mockRepo *event_processor.MockRepo) {
+			mockClosure: func(mockRepo *MockEventRepo) {
 				mockRepo.On("CountQueryEventsByMetadata", mock.Anything, mock.Anything).Return(([]map[string]interface{})(nil), nil).Once()
 			},
 			result:     model.FailureResponse("Query not available", http.StatusNotFound),
@@ -206,7 +204,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			mockRepo := &event_processor.MockRepo{}
+			mockRepo := &MockEventRepo{}
 			test.mockClosure(mockRepo)
 			defer mockRepo.AssertExpectations(t)
 
@@ -214,7 +212,7 @@ func Test_CountEventsByMetaData(t *testing.T) {
 				EventRepo: mockRepo,
 			}
 
-			actualResponse := es.CountEventsByMetadata([]string{"Client"})
+			actualResponse := es.CountQueryEventsByMetadata([]string{"Client"})
 			assert.Equal(t, test.statusCode, actualResponse.StatusCode)
 			assert.Equal(t, test.result, actualResponse)
 
@@ -225,17 +223,17 @@ func Test_CountEventsByMetaData(t *testing.T) {
 
 func getSampleEvent() map[string]interface{} {
 	events := make(map[string]interface{}, 0)
-	events["data.'query'.'deal'"] = 10
-	events["data.'deal'.'title'"] = 20
-	events["data.'deal'.'price'"] = 30
+	events["query.deal"] = 10
+	events["deal.title"] = 20
+	events["deal.price"] = 30
 	return events
 }
 
 func getSampleEventByDay() []map[string]interface{} {
 	events := make(map[string]interface{}, 0)
-	events["data.'query'.'deal'"] = 10
-	events["data.'deal'.'title'"] = 20
-	events["data.'deal'.'price'"] = 30
+	events["query.deal"] = 10
+	events["deal.title"] = 20
+	events["deal.price"] = 30
 	events["processed_time"] = "2022-05-10T00:00:00Z"
 	list := make([]map[string]interface{}, 0)
 	list = append(list, events)
@@ -245,12 +243,36 @@ func getSampleEventByDay() []map[string]interface{} {
 
 func getSampleEventByMetadata() []map[string]interface{} {
 	events := make(map[string]interface{}, 0)
-	events["data.'query'.'deal'"] = 10
-	events["data.'deal'.'title'"] = 20
-	events["data.'deal'.'price'"] = 30
+	events["query.deal"] = 10
+	events["deal.title"] = 20
+	events["deal.price"] = 30
 	events["client"] = "client_id"
 	list := make([]map[string]interface{}, 0)
 	list = append(list, events)
 
 	return list
+}
+
+type MockEventRepo struct {
+	mock.Mock
+}
+
+func (m *MockEventRepo) InsertQueryEvent(data model.QueryEvent) error {
+	args := m.Called(data)
+	return args.Error(0)
+}
+
+func (m *MockEventRepo) GetQueryEventCount(paths []string) (map[string]interface{}, error) {
+	args := m.Called(paths)
+	return args.Get(0).(map[string]interface{}), args.Error(1)
+}
+
+func (m *MockEventRepo) GetQueryEventCountByDay(paths []string) ([]map[string]interface{}, error) {
+	args := m.Called(paths)
+	return args.Get(0).([]map[string]interface{}), args.Error(1)
+}
+
+func (m *MockEventRepo) CountQueryEventsByMetadata(paths []string, groupBy []string) ([]map[string]interface{}, error) {
+	args := m.Called(paths, groupBy)
+	return args.Get(0).([]map[string]interface{}), args.Error(1)
 }

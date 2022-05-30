@@ -141,9 +141,9 @@ func Test_GetEventsCountByDay(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			w := httptest.NewRecorder()
+			actual := httptest.NewRecorder()
 			gin.SetMode(gin.TestMode)
-			c, _ := gin.CreateTestContext(w)
+			c, _ := gin.CreateTestContext(actual)
 			mockService := &MockService{}
 			test.mockClosure(mockService)
 
@@ -152,11 +152,11 @@ func Test_GetEventsCountByDay(t *testing.T) {
 			}
 			ec.GetEventsCountByDay(c)
 
-			assert.Equal(t, test.httpStatus, w.Code)
-			if w.Code != http.StatusOK {
+			assert.Equal(t, test.httpStatus, actual.Code)
+			if actual.Code != http.StatusOK {
 
 				response := model.ErrorMessage{}
-				err := json.Unmarshal([]byte(w.Body.String()), &response)
+				err := json.Unmarshal([]byte(actual.Body.String()), &response)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -165,7 +165,7 @@ func Test_GetEventsCountByDay(t *testing.T) {
 			} else {
 
 				var data string
-				err := json.Unmarshal([]byte(w.Body.String()), &data)
+				err := json.Unmarshal([]byte(actual.Body.String()), &data)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -185,6 +185,7 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 		Query       string
 		mockClosure func(mock *MockService)
 	}
+
 	groupByTags := []string{"Client"}
 	failureResponse := model.FailureResponse("Query not found", http.StatusNotFound)
 	badRequestResponse := model.FailureResponse("Groupby params are mandatory", http.StatusBadRequest)
@@ -238,10 +239,10 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			w := httptest.NewRecorder()
+			actual := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/event-processor/api/v1/countByMetadata", nil)
 			gin.SetMode(gin.TestMode)
-			c, _ := gin.CreateTestContext(w)
+			c, _ := gin.CreateTestContext(actual)
 			q := req.URL.Query()
 			q.Add("group_by_tag", test.Query)
 			req.URL.RawQuery = q.Encode()
@@ -254,11 +255,10 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 			}
 			ec.GetEventsCountByMetadata(c)
 
-			assert.Equal(t, test.httpStatus, w.Code)
-			if w.Code != http.StatusOK {
-
+			assert.Equal(t, test.httpStatus, actual.Code)
+			if actual.Code != http.StatusOK {
 				response := model.ErrorMessage{}
-				err := json.Unmarshal([]byte(w.Body.String()), &response)
+				err := json.Unmarshal([]byte(actual.Body.String()), &response)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -267,7 +267,7 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 			} else {
 
 				var data string
-				err := json.Unmarshal([]byte(w.Body.String()), &data)
+				err := json.Unmarshal([]byte(actual.Body.String()), &data)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -292,7 +292,7 @@ func (m *MockService) CountEventsByDay() *model.APIResponse {
 	return args.Get(0).(*model.APIResponse)
 }
 
-func (m *MockService) CountEventsByMetadata(groupBy []string) *model.APIResponse {
+func (m *MockService) CountQueryEventsByMetadata(groupBy []string) *model.APIResponse {
 	args := m.Called(groupBy)
 	return args.Get(0).(*model.APIResponse)
 }

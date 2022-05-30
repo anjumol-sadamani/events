@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func Test_ProcessPushEvents(t *testing.T) {
+func Test_ReadEvents(t *testing.T) {
 	ctx := context.Background()
 	event := sampleEvent()
 	schema := sampleSchemaEvent()
@@ -198,7 +198,7 @@ func sampleSchemaEvent() *kafka.Message {
 		Headers: []kafka.Header{
 			{
 				Key:   "type",
-				Value: []byte("ParsedSchemaEvent"),
+				Value: []byte("Schema"),
 			},
 		}}
 }

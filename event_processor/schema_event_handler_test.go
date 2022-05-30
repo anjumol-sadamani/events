@@ -24,11 +24,6 @@ func Test_SaveSchema(t *testing.T) {
 			name: "Success",
 			data: `{ "Query":{ "deal":"Deal" }, "Deal":{ "title":"String", "price":"Float"}} `,
 			mockClosure: func(mockRepo *MockSchemaRepo) {
-				mockRepo.On("InsertSchema",
-					model.ParsedSchemaEvent{
-						SchemaPath: `{ "Query":{ "deal":"Deal" }, "Deal":{ "title":"String", "price":"Float"}} `,
-					}).Return(nil).Once()
-
 				mockRepo.On("InsertParsedSchema", mock.Anything).Return(nil).Once()
 			},
 			result: nil,
@@ -37,7 +32,6 @@ func Test_SaveSchema(t *testing.T) {
 			name: "InValidJSON",
 			data: ``,
 			mockClosure: func(mockRepo *MockSchemaRepo) {
-				mockRepo.On("InsertSchema", mock.Anything).Return(nil).Once()
 				mockRepo.On("InsertParsedSchema", mock.Anything).Return(nil).Once()
 			},
 			result: errors.New("Invalid JSON"),
@@ -45,9 +39,9 @@ func Test_SaveSchema(t *testing.T) {
 	}
 
 	expectedSchemaList := []string{
-		"data.'query'.'deal'",
-		"data.'deal'.'title'",
-		"data.'deal'.'price'",
+		"query,deal",
+		"deal,title",
+		"deal,price",
 	}
 
 	for _, test := range tests {
@@ -63,7 +57,6 @@ func Test_SaveSchema(t *testing.T) {
 			res, er := ec.SaveSchema(test.data)
 
 			assert.Equal(t, test.result, er)
-
 			if test.name == "Success" {
 				assert.True(t, reflect.DeepEqual(expectedSchemaList, res))
 			}
@@ -75,12 +68,7 @@ type MockSchemaRepo struct {
 	mock.Mock
 }
 
-func (sr *MockSchemaRepo) InsertSchema(schema model.ParsedSchemaEvent) error {
-	args := sr.Called(schema)
-	return args.Error(0)
-}
-
-func (sr *MockSchemaRepo) InsertParsedSchema(schemaColumns []string) error {
+func (sr *MockSchemaRepo) InsertParsedSchema(schemaColumns []model.ParsedSchemaEvent) error {
 	args := sr.Called(schemaColumns)
 	return args.Error(0)
 }

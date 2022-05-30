@@ -30,9 +30,7 @@ func (ec *EventRetrieveController) GetEventsCountByMetadata(c *gin.Context) {
 		c.JSON(response.StatusCode, response.Data)
 		return
 	}
-
 	groupByTags := strings.Split(groupByParams, ",")
-
-	response := ec.EventRetrieveService.CountEventsByMetadata(groupByTags)
+	response := ec.EventRetrieveService.CountQueryEventsByMetadata(groupByTags)
 	c.JSON(response.StatusCode, response.Data)
 }
