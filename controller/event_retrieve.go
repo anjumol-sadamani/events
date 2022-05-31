@@ -24,9 +24,9 @@ func (ec *EventRetrieveController) GetEventsCountByDay(c *gin.Context) {
 }
 
 func (ec *EventRetrieveController) GetEventsCountByMetadata(c *gin.Context) {
-	groupByParams := c.Request.URL.Query().Get("group_by_tag")
+	groupByParams := c.Request.URL.Query().Get("metadata")
 	if groupByParams == "" {
-		response := model.FailureResponse("Groupby params are mandatory", http.StatusBadRequest)
+		response := model.FailureResponse("metadata params are mandatory", http.StatusBadRequest)
 		c.JSON(response.StatusCode, response.Data)
 		return
 	}

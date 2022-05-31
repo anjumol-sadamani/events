@@ -49,7 +49,7 @@ func DevMessageProducer(ctx context.Context) {
 	checkError(err)
 	messageKey++
 
-	for {
+	for i := 0; i < 10; i++ {
 		err := writer.WriteMessages(ctx, kafka.Message{
 			Key:   []byte(strconv.Itoa(messageKey)),
 			Value: getMessage(),
@@ -82,11 +82,8 @@ func getMessage() []byte {
 				{
 				"deal":{
 					"title":true,
-				"price":true,
-				"user":{
-				"name":true
-				}
-				}
+				    "price":true
+					}
 				}`),
 		[]byte(`
 				{

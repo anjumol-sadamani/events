@@ -188,7 +188,7 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 
 	metadata := []string{"Client"}
 	failureResponse := model.FailureResponse("Query not found", http.StatusNotFound)
-	badRequestResponse := model.FailureResponse("Groupby params are mandatory", http.StatusBadRequest)
+	badRequestResponse := model.FailureResponse("metadata params are mandatory", http.StatusBadRequest)
 	successResponse := model.SuccessResponse(`[
 		{
 			"deal": {
@@ -244,7 +244,7 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			c, _ := gin.CreateTestContext(actual)
 			q := req.URL.Query()
-			q.Add("group_by_tag", test.Query)
+			q.Add("metadata", test.Query)
 			req.URL.RawQuery = q.Encode()
 			c.Request = req
 			mockService := &MockService{}

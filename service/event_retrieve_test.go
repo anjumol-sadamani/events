@@ -203,7 +203,6 @@ func Test_CountEventsByMetaData(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-
 			mockRepo := &MockEventRepo{}
 			test.mockClosure(mockRepo)
 			defer mockRepo.AssertExpectations(t)

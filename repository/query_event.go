@@ -37,7 +37,6 @@ func (er *EventRepositoryImpl) InsertQueryEvent(md model.QueryEvent) error {
 func (er *EventRepositoryImpl) GetQueryEventCount(paths []string) (map[string]interface{}, error) {
 	countQueries := generateCountQuery(paths)
 	var results map[string]interface{}
-	println(strings.Join(countQueries, ","))
 	err := er.DB.Table("query_events").Select(strings.Join(countQueries, ",")).Find(&results).Error
 	if err != nil {
 		log.Errorf("Error occurred while fetch the event count from DB")
