@@ -58,9 +58,9 @@ func Test_GetEventsCount(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			w := httptest.NewRecorder()
+			actual := httptest.NewRecorder()
 			gin.SetMode(gin.TestMode)
-			c, _ := gin.CreateTestContext(w)
+			c, _ := gin.CreateTestContext(actual)
 			mockService := &MockService{}
 			test.mockClosure(mockService)
 
@@ -69,11 +69,11 @@ func Test_GetEventsCount(t *testing.T) {
 			}
 			ec.GetEventsCount(c)
 
-			assert.Equal(t, test.httpStatus, w.Code)
-			if w.Code != http.StatusOK {
+			assert.Equal(t, test.httpStatus, actual.Code)
+			if actual.Code != http.StatusOK {
 
 				response := model.ErrorMessage{}
-				err := json.Unmarshal([]byte(w.Body.String()), &response)
+				err := json.Unmarshal([]byte(actual.Body.String()), &response)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -82,7 +82,7 @@ func Test_GetEventsCount(t *testing.T) {
 			} else {
 
 				var data string
-				err := json.Unmarshal([]byte(w.Body.String()), &data)
+				err := json.Unmarshal([]byte(actual.Body.String()), &data)
 				if err != nil {
 					fmt.Println("err", err.Error())
 				}
@@ -186,7 +186,7 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 		mockClosure func(mock *MockService)
 	}
 
-	groupByTags := []string{"Client"}
+	metadata := []string{"Client"}
 	failureResponse := model.FailureResponse("Query not found", http.StatusNotFound)
 	badRequestResponse := model.FailureResponse("Groupby params are mandatory", http.StatusBadRequest)
 	successResponse := model.SuccessResponse(`[
@@ -214,25 +214,25 @@ func Test_GetEventsCountByMetadata(t *testing.T) {
 			apiResponse: successResponse,
 			httpStatus:  successResponse.StatusCode,
 			mockClosure: func(mock *MockService) {
-				mock.On("CountQueryEventsByMetadata", groupByTags).Return(successResponse)
+				mock.On("CountQueryEventsByMetadata", metadata).Return(successResponse)
 			},
-			Query: groupByTags[0],
+			Query: metadata[0],
 		},
 		{
 			name:        "Query not found",
 			apiResponse: failureResponse,
 			httpStatus:  failureResponse.StatusCode,
 			mockClosure: func(mock *MockService) {
-				mock.On("CountQueryEventsByMetadata", groupByTags).Return(failureResponse)
+				mock.On("CountQueryEventsByMetadata", metadata).Return(failureResponse)
 			},
-			Query: groupByTags[0],
+			Query: metadata[0],
 		},
 		{
 			name:        "Mandatory params",
 			apiResponse: badRequestResponse,
 			httpStatus:  badRequestResponse.StatusCode,
 			mockClosure: func(mock *MockService) {
-				mock.On("CountQueryEventsByMetadata", groupByTags).Return(failureResponse)
+				mock.On("CountQueryEventsByMetadata", metadata).Return(failureResponse)
 			},
 		},
 	}
@@ -292,7 +292,7 @@ func (m *MockService) CountEventsByDay() *model.APIResponse {
 	return args.Get(0).(*model.APIResponse)
 }
 
-func (m *MockService) CountQueryEventsByMetadata(groupBy []string) *model.APIResponse {
-	args := m.Called(groupBy)
+func (m *MockService) CountQueryEventsByMetadata(metadata []string) *model.APIResponse {
+	args := m.Called(metadata)
 	return args.Get(0).(*model.APIResponse)
 }

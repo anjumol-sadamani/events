@@ -51,8 +51,8 @@ func (e *EventRetrieveServiceImpl) CountEventsByDay() *model.APIResponse {
 	return model.SuccessResponse(generateJSONArray(res))
 }
 
-func (e *EventRetrieveServiceImpl) CountQueryEventsByMetadata(groupBy []string) *model.APIResponse {
-	res, err := e.EventRepo.CountQueryEventsByMetadata(event_processor.ParsedSchemaList, groupBy)
+func (e *EventRetrieveServiceImpl) CountQueryEventsByMetadata(metaData []string) *model.APIResponse {
+	res, err := e.EventRepo.CountQueryEventsByMetadata(event_processor.ParsedSchemaList, metaData)
 
 	if err != nil {
 		return model.FailureResponse("Failed to get count", http.StatusInternalServerError)

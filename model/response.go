@@ -7,11 +7,6 @@ type APIResponse struct {
 	Data       interface{} `json:"data"`
 }
 
-type APIResponseEventsByDay struct {
-	Day  int         `json:"day"`
-	Data interface{} `json:"data"`
-}
-
 type ErrorMessage struct {
 	Message string `json:"error_message"`
 }

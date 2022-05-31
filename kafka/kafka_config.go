@@ -28,11 +28,15 @@ type KafkaConfig struct {
 	DlqWriter   *kafka.Writer
 }
 
-//Split the brokers string into slice.
-//Example kafkaBrokerStr = "localhost:8080,localhost:8081"
-// will return ["localhost:8080", "localhost:8081"]
-func brokersSlice(kafkaBrokerStr string) []string {
-	return strings.Split(kafkaBrokerStr, ",")
+func CreateKafkaConfig() *KafkaConfig {
+	configuration := config.GetConfig()
+	k := &KafkaConfig{
+		Conn:        CreateKafkaConnection(),
+		Reader:      CreateKafkaReader(configuration.KafkaTopic),
+		RetryWriter: CreateWriter(configuration.KafkaRetryTopic),
+		DlqWriter:   CreateWriter(configuration.KafkaDlqTopic),
+	}
+	return k
 }
 
 func CreateKafkaConnection() *kafka.Conn {
@@ -66,17 +70,6 @@ func CreateKafkaReader(topic string) *KafkaReader {
 	return kr
 }
 
-func CreateKafkaConfig() *KafkaConfig {
-	configuration := config.GetConfig()
-	k := &KafkaConfig{
-		Conn:        CreateKafkaConnection(),
-		Reader:      CreateKafkaReader(configuration.KafkaTopic),
-		RetryWriter: CreateWriter(configuration.KafkaRetryTopic),
-		DlqWriter:   CreateWriter(configuration.KafkaDlqTopic),
-	}
-	return k
-}
-
 func CreateWriter(topic string) *kafka.Writer {
 	kafkaBrokerStr := config.GetConfig().KafkaServerHost
 	kafkaBrokers := strings.Split(kafkaBrokerStr, ",")
@@ -85,14 +78,6 @@ func CreateWriter(topic string) *kafka.Writer {
 		Topic: topic,
 	}
 	return wt
-}
-
-func newTopic(topic string, numPartitions, replicationFactor int) kafka.TopicConfig {
-	return kafka.TopicConfig{
-		Topic:             topic,
-		NumPartitions:     numPartitions,
-		ReplicationFactor: replicationFactor,
-	}
 }
 
 func CreateKafkaTopic(k *KafkaConfig) {
@@ -145,4 +130,19 @@ func (k *KafkaConfig) WriteMessageToDLQTopic(ctx context.Context, ei *model.Even
 		return err
 	}
 	return nil
+}
+
+//Split the brokers string into slice.
+//Example kafkaBrokerStr = "localhost:8080,localhost:8081"
+// will return ["localhost:8080", "localhost:8081"]
+func brokersSlice(kafkaBrokerStr string) []string {
+	return strings.Split(kafkaBrokerStr, ",")
+}
+
+func newTopic(topic string, numPartitions, replicationFactor int) kafka.TopicConfig {
+	return kafka.TopicConfig{
+		Topic:             topic,
+		NumPartitions:     numPartitions,
+		ReplicationFactor: replicationFactor,
+	}
 }

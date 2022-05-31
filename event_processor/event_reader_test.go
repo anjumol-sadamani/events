@@ -18,7 +18,7 @@ import (
 
 func Test_ReadEvents(t *testing.T) {
 	ctx := context.Background()
-	event := sampleEvent()
+	query := sampleQuery()
 	schema := sampleSchemaEvent()
 	data := string(schema.Value)
 	type testData struct {
@@ -30,14 +30,14 @@ func Test_ReadEvents(t *testing.T) {
 
 	tests := []testData{
 		{
-			name: "Process events",
+			name: "Process queries",
+			kafkaMock: func(mock *MockKafkaConsumer) {
+				mock.On("Read").Return(query, nil).Once()
+				mock.On("CommitMessage", *query).Once().Return(nil)
+
+			},
 			mockClosure: func(mock *MockService) {
 				mock.AssertNumberOfCalls(t, "SaveSchema", 0)
-			},
-			kafkaMock: func(mock *MockKafkaConsumer) {
-				mock.On("Read").Return(event, nil).Once()
-				mock.On("CommitMessage", *event).Once().Return(nil)
-
 			},
 			eventsCount: 1,
 		},
@@ -83,7 +83,7 @@ func Test_PersistEvents(t *testing.T) {
 	ctx := context.Background()
 
 	eventInfo := model.EventInfo{
-		Data:      string(sampleEvent().Value),
+		Data:      string(sampleQuery().Value),
 		EventType: "Query",
 	}
 
@@ -203,7 +203,7 @@ func sampleSchemaEvent() *kafka.Message {
 		}}
 }
 
-func sampleEvent() *kafka.Message {
+func sampleQuery() *kafka.Message {
 	json, _ := json.Marshal(`{
 	"deal":{
 	"price":true

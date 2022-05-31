@@ -34,7 +34,7 @@ func Test_SaveSchema(t *testing.T) {
 			mockClosure: func(mockRepo *MockSchemaRepo) {
 				mockRepo.On("InsertParsedSchema", mock.Anything).Return(nil).Once()
 			},
-			result: errors.New("Invalid JSON"),
+			result: errors.New("invalid JSON"),
 		},
 	}
 

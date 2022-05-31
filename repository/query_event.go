@@ -17,7 +17,7 @@ type EventRepository interface {
 	InsertQueryEvent(queryEvent model.QueryEvent) error
 	GetQueryEventCount(paths []string) (map[string]interface{}, error)
 	GetQueryEventCountByDay(paths []string) ([]map[string]interface{}, error)
-	CountQueryEventsByMetadata(paths []string, groupBy []string) ([]map[string]interface{}, error)
+	CountQueryEventsByMetadata(paths []string, metaData []string) ([]map[string]interface{}, error)
 }
 
 type EventRepositoryImpl struct {
@@ -55,9 +55,9 @@ func (er *EventRepositoryImpl) GetQueryEventCountByDay(paths []string) ([]map[st
 
 func (er *EventRepositoryImpl) CountQueryEventsByMetadata(paths []string, metaData []string) ([]map[string]interface{}, error) {
 	countQueries := generateCountQuery(paths)
-	groupQueries := strings.Join(metaData, ",")
+	metaDatas := strings.Join(metaData, ",")
 	var results []map[string]interface{}
-	er.DB.Table("query_events").Select(groupQueries + "," + strings.Join(countQueries, ",")).Group(groupQueries).Find(&results)
+	er.DB.Table("query_events").Select(metaDatas + "," + strings.Join(countQueries, ",")).Group(metaDatas).Find(&results)
 	return results, nil
 }
 
