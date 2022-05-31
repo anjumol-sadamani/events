@@ -91,22 +91,15 @@ func getMessage() []byte {
 		[]byte(`
 				{
 				"deal":{
-					"title":true,
-					"user":{
-						"name":true
-						}
+					"title":true
 					}
 				}`),
 		[]byte(`
 				{
 				"deal":{
 					"title":true,
-					"price":true,
-				"user":{
-				"id":true,
-				"name":true
-				}
-				}
+					"price":true
+					}
 				}`),
 	}
 

@@ -30,8 +30,8 @@ func (sh *SchemaHandlerServiceImpl) SaveSchema(inputSchema string) ([]string, er
 	var schema interface{}
 	err := json.Unmarshal([]byte(inputSchema), &schema)
 	if err != nil {
-		log.Errorf("ParsedSchemaEvent unmarshal error %s", err.Error())
-		return nil, errors.New("Invalid JSON")
+		log.Errorf("schema unmarshal error %s", err.Error())
+		return nil, errors.New("invalid JSON")
 	}
 	sh.parseSchema(schema, "")
 

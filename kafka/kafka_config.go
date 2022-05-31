@@ -6,7 +6,6 @@ import (
 	"eventprocessor/model"
 	"fmt"
 	"math/rand"
-	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -39,21 +38,9 @@ func brokersSlice(kafkaBrokerStr string) []string {
 func CreateKafkaConnection() *kafka.Conn {
 	configuration := config.GetConfig()
 	kafkaBrokers := brokersSlice(configuration.KafkaServerHost)
-	var connLeader *kafka.Conn
-	//todo doubt
-	for _, broker := range kafkaBrokers {
-		conn, err := kafka.Dial("tcp", broker)
-		if err != nil {
-			log.Fatalf("Error while Dialing to the kafka broker: %s", err.Error())
-		}
-		controller, err := conn.Controller()
-		if err != nil {
-			log.Fatalf("error while creating the connection with the broker: %s", err.Error())
-		}
-		connLeader, err = kafka.Dial("tcp", net.JoinHostPort(controller.Host, strconv.Itoa(controller.Port)))
-		if err != nil {
-			log.Fatalf(err.Error())
-		}
+	connLeader, err := kafka.Dial("tcp", kafkaBrokers[0])
+	if err != nil {
+		log.Fatalf("Error while Dialing to the kafka broker: %s", err.Error())
 	}
 	return connLeader
 }

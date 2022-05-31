@@ -15,7 +15,7 @@ import (
 
 const (
 	SCHEMA_TYPE     = "Schema"
-	EVENT_TYPE      = "Query"
+	QUERY_TYPE      = "Query"
 	MAX_RETRY_COUNT = 10
 )
 
@@ -27,7 +27,7 @@ type EventListener struct {
 	SchemaService SchemaHandlerService
 	EventChannel  chan model.EventInfo
 	Wg            *sync.WaitGroup
-	Stop          chan os.Signal
+	StopChannel   chan os.Signal
 }
 
 func (el *EventListener) ReadEvents() {
@@ -62,7 +62,7 @@ func (el *EventListener) readEventsFromKafka() {
 		return
 	}
 
-	eventInfo := &model.EventInfo{
+	eventInfo := model.EventInfo{
 		Data:      data,
 		EventType: eventType,
 	}
@@ -73,8 +73,8 @@ func (el *EventListener) readEventsFromKafka() {
 		if err != nil {
 			log.Error(err)
 		}
-	case EVENT_TYPE:
-		el.EventChannel <- *eventInfo
+	case QUERY_TYPE:
+		el.EventChannel <- eventInfo
 	default:
 		log.Warnf("invalid QueryEvent type received %s", eventInfo.EventType)
 	}
@@ -96,7 +96,7 @@ func (el *EventListener) persistQueryFromKafka() bool {
 		if dbError := el.EventService.SaveQueryEvent(eventInfo.Data); dbError != nil {
 			el.handleRetry(eventInfo)
 		}
-	case sig := <-el.Stop:
+	case sig := <-el.StopChannel:
 		log.Errorf("Got %s signal. Aborting ..!", sig)
 		return true
 	}
